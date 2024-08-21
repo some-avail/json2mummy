@@ -1,0 +1,35 @@
+
+
+<!-- <link rel="stylesheet" href="controls.css"> -->
+<div class="row-main">
+  <form action="/controls" method="POST" target="{{newtab}}">
+  <div class="col-mid">
+
+
+  <div class="mybuttons">      
+    <div class="thisbutton" style="float: left;"><button type="submit" >Post request to local webserver</button></div><br><br>
+    <div class="thislink" style="color: {{{linkcolor}}}">
+    <a href="/hello" target="_blank">Spawn new tab with: Hello world</a></div>
+  </div>
+  
+  
+    <div class="mid-top">
+      Status: <br>
+      {{{statustext}}}
+    </div>
+    
+    <div class= "mid-mid">
+    
+      {{{dropdown1}}}<br><br>
+      {{{dropdown2}}}<br><br>
+      {{{radiobuttonset1}}}<br><br>
+      {{{checkboxset1}}}<br><br>
+    </div>
+  </div>
+  </form>
+  <div class="col-right">
+    <h4>The values of the controls</h4>
+    (For the dropdowns the hidden real values will be shown, instead of the "show-values")<br><br>
+    {{{righttext}}}
+  </div>
+</div>

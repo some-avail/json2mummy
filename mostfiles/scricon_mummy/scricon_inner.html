@@ -1,0 +1,56 @@
+<!-- project_inner.html is nested within project_outer.html 
+      by means of the moustachu-variable controls-group in the outer page.
+      In this page the real content is placed. Moustachu-vars have a 
+      double or triple curly brace. -->
+
+
+<div class="row-main">
+  <form id="webbieform" action="/{{project_prefix}}" method="POST" target="{{newtab}}">
+    <div class="col-mid">
+
+
+      <div class="mybuttons">      
+        <div class="thisbutton" style="float: left;">
+          <button type="submit" >Post request to local webserver</button>
+        </div>
+        <br><br>
+        <div class="thislink" style="color: {{{linkcolor}}}">
+          <a href="/hello" target="_blank">Spawn new tab with: Hello world</a>
+        </div>
+      </div>
+      
+      <div class="mid-top">
+        Status: <br>
+        {{{statustext}}}<br><br>
+      </div>
+
+
+      <div class= "mid-mid">
+        <textarea class = "tbox" name="tbox1" id="tbox1" rows="1">Text to move</textarea>
+        <button type="button" onclick="copyText()">Copy text</button>
+        <textarea class = "tbox" name="tbox2" id="tbox2" rows="1"></textarea>
+        <br><br>
+        <button type="button" onclick="testSetCookie()">Set cookie</button>
+        <button type="button" onclick="sendFunctionToServer()">Send function to server</button>
+
+        <br><br>
+        {{{dropdown1}}}<br><br>
+        {{{dropdown2}}}<br><br>
+        {{{dropdown3}}}<br><br>
+
+        <br><br>
+        {{{radiobuttonset1}}}<br><br>
+        {{{checkboxset1}}}<br><br>
+      </div>
+    </div>
+  </form>
+  <div class="col-right">
+    <h4>The values of the controls</h4>
+    (For the dropdowns the hidden real values will be shown, instead of the "show-values")<br><br>
+    {{{righttext}}}
+    <br><br>
+    <!-- Sample table:<br><br> -->
+    {{{table01}}}
+  </div>
+</div>
+

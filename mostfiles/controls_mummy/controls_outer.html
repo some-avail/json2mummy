@@ -1,0 +1,36 @@
+<!-- outer_html.html version 1.1 matching flashread.nim version 0.88 ao -->
+<html>
+<head>
+
+   <link rel="stylesheet" href="/public/controls.css">
+   <title>Controls-tester</title>
+
+<!--    <script type="text/javascript">
+      fetch("controls_gui_test.json")
+        .then(results => results.json())
+        .then(data => {
+            console.log(data["controls-webcontrols"]);
+          // or whatever you wanna do with the data
+        });
+   </script> -->
+   
+</head>
+
+
+<body>
+<div class="row-top">
+  
+  
+  <div class="rtop-left" >{{namesuffix}}</div>
+  <div class="rtop-mid" >Controls {{version}}</div>
+  <div class="rtop-right" >{{loadtime}}</div>
+  
+</div>
+
+ 
+  {{{controls-group}}}
+
+
+</body>
+</html>
+

@@ -1,0 +1,111 @@
+/* version 0.81
+
+	ADAP HIS
+	- set the form-div below the status-div	
+  -add url-textarea
+  -add time
+  -renamed divs to names without spaces
+  */
+
+
+body {
+/*  background-color: lightgoldenrodyellow;*/
+  background-color: beige;
+}
+
+textarea {
+  min-height: 10 px;
+  height: 10 px;
+}
+
+table, th, td {
+  border: 1px solid black;
+  /*border-collapse: collapse;*/
+}
+
+th, td {
+  padding: 10px;
+}
+
+table {
+  margin-left: auto; 
+  margin-right: auto;
+}
+
+.row-top {
+  color: green;
+  background-color:lightsteelblue;
+  width: 100%;
+  height: 3.5%}
+
+
+.rtop-left {
+  float: left;
+  width: 33%;
+  }
+
+
+.rtop-mid {
+  float: left;
+  width: 33%;
+  font-weight: bold;
+  }
+  
+
+.rtop-right {
+  float: right;
+  width: 33%;    
+  }
+  
+
+
+
+.row-main {
+/*  float: left;*/
+  width: 100%;
+}
+
+
+.col-mid {
+  float: left;
+  width: 40%;
+  height: 100%;
+  padding: 15px;
+/*  background-color:whitesmoke;*/
+  background-color: #bfd9bf;
+}
+
+.mybuttons {
+  width:100%;
+  padding: 10px  
+  }
+
+/* status-gedeelte */
+.mid-top  {
+  float:top;
+  height: 20%;
+  width: 100%;
+  color: blue;
+  font-size: small;
+  }
+
+/* bediensel-gedeelte*/
+.mid-mid	{
+	height: 70%;
+	font-size: 95%;
+	}
+
+/*uitvoer-gedeelte*/
+.col-right {
+  float: right;
+  width: 54%;
+  height: 100%;
+  background-color: lightskyblue;
+  padding: 1.5%}
+
+/* Responsive layout - makes the columns stack on top of each other instead of next to each other */
+@media screen and (max-width: 600px) {
+  .col-mid, .col-right {
+    width: 100%;
+  }
+}

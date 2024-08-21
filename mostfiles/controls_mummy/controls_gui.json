@@ -1,0 +1,86 @@
+
+
+
+{
+  "controls-webcontrols":
+  {
+    "project-properties":
+    {
+      "p-description": "Project to showcase all controls generatable from a json-file.",
+      "p-version": 0.12,
+      "tip-one": "Append abbreviations like fp (first page) to maintain uniques of keys",
+      "tip-two": "Arrays dont have to be unique (are not searched for keys from the outside)"
+    }
+  },
+  "all web-pages":
+    {
+      "first web-page":
+      {
+        "web-elements fp":
+        {
+          "radio-button-sets fp":
+          {
+            "radio-set-example":
+            [
+              {"name":"rbut1","lab":"this is button one","selected":true},
+              {"name":"rbut2","lab":"this is button two","selected":false},
+              {"name":"rbut3","lab":"and here nr. 3","selected":false}
+            ],
+            "radio-set-two":
+            [
+              {"name":"rabut1","lab":"Bouton un","selected":true},
+              {"name":"rabut2","lab":"Bouton deux","selected":false},
+              {"name":"rabut3","lab":"Bouton trois","selected":false}
+            ]
+          }
+        },
+        
+          "check-box-sets fp":
+          {
+            "check-set-example":
+            [
+              {"name":"check1","lab":"this is box one","selected":true},
+              {"name":"check2","lab":"this is box two","selected":true},
+              {"name":"check3","lab":"and here box 3","selected":false}
+            ],
+            "check-set-two":
+            [
+              {"name":"chk1","lab":"vinkvakje 1","selected":true},
+              {"name":"chk2","lab":"vinkvakje 2","selected":false},
+              {"name":"chk3","lab":"vinkvakje 3","selected":true}
+            ]
+          }
+        },
+          "dropdowns fp":
+          {
+            "dropdownname_01":
+            [
+              {"ddlab": "Some label:"},
+              {"ddvalues": 
+                [
+                  {"real-value": "some realvalue", "show-value": "this value is shown"},
+                  {"real-value": "second realvalue", "show-value": "second value is shown"},
+                  {"real-value": "third realvalue", "show-value": "third value is shown"}
+                ]
+              }
+            ],
+            "dropdownname_02":
+            [
+              {"ddlab": "Some label:"},
+              {"ddvalues": 
+                [
+                  {"real-value": "echte waarde", "show-value": "getoonde waarde 1"},
+                  {"real-value": "tweede waarde", "show-value": "getoonde waarde 2"},
+                  {"real-value": "derde waarde", "show-value": "getoonde waarde 3"}
+                ]
+              }
+            ]
+          }
+    }
+}
+
+
+
+
+
+
