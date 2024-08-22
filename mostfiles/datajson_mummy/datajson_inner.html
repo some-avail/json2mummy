@@ -1,0 +1,46 @@
+<!-- project_inner.html is nested within project_outer.html 
+      by means of the moustachu-variable controls-group in the outer page.
+      In this page the real content is placed. Moustachu-vars have a 
+      double or triple curly brace. -->
+
+
+<div class="row-main">
+  <form id="webbieform" action="/{{project_prefix}}" method="POST" target="{{newtab}}">
+    <div class="col-mid">
+      <br>
+      <textarea name="tab_ID" readonly class="specialfield">{{{tab_id}}}</textarea>
+      <textarea name="curaction" readonly class="specialfield">idle</textarea><br><br>
+      {{{dropdown1}}}<br><br>
+      <center>
+      <button class="mybuttons" type="button" onclick="butLoadTable()">Load table</button><br>
+
+      <button class="mybuttons" type="button" onclick="butClearFields()">Clear entry-row</button><br>
+      <button class="mybuttons" type="button" onclick="butClearFilter()">Clear filter-row</button><br>
+      <button class="mybuttons" type="button" onclick="butSave()">Save/add record</button><br>
+      <button class="mybuttons" type="button" onclick="butDelete()">Delete record</button><br><br>
+      </center>
+
+      Status: <br><br>
+      {{{statustext}}}<br><br>
+
+      
+      <div class="mid-top">
+      </div>
+
+
+      <div class= "mid-mid">
+      </div>
+    </div>
+    <div class="col-right">
+      <h4>Data-table</h4>
+      {{{righttext}}}
+      <br><br>
+      <!-- Sample table:<br><br> -->
+      {{{table01}}}
+
+
+    </div>
+  </form>
+
+</div>
+

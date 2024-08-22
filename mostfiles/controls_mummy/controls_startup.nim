@@ -12,6 +12,20 @@ in either of two variables (i dont know if they are fully equivalent):
 * variables like @"controlname"
 * request.params["controlname"]
 
+
+-to mummify a jester-project
+  - import needed mummy modules (3) and remove jester
+  - move the route-parts to separate procs like 
+    - getProject(request: Request)
+    - postProject(request: Request)
+  - remove the routes-macro
+  - update the paths in project_outer.html (prefix "/public/")
+  - add the cssHandler and the scriptHandler to enable the loading of respective files
+  - add the mummy-routes
+  - in mummy you set persistence to persistOnDisk because in mummy you must compile for with multi-threading
+  - make sure no addons (like ublock) limit your view 
+
+
 - to enable call by a sibling project (see the alacarte/superproject.nim) you must do some non-trivial adaptations to the code:
   - parentization of paths applied 
     - add prefixes like: ../subproject
@@ -19,6 +33,7 @@ in either of two variables (i dont know if they are fully equivalent):
   - add: when isMainModule
   - create constants for project and sibling-prefix
   - publicize constants and procs with a *
+
 
 ADAP HIS
 -change static_config and calls
