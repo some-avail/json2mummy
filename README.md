@@ -3,7 +3,7 @@
 
 This repo features the migration of some json2web-projects to mummy. It has been made because the jester-repo has become low-maintained, and also it is not clear if some will take up the project again. 
 
-Currently the following repos are migrated or newly created:
+Currently the following repos have been migrated or newly created:
 - hello_world; a minimal mummy-app
 - controls_mummy; a project showcasing basic controls (has been siblingized) from the webserver.
 - alacarte/superproject; showcasing how to create a collection-project (thru siblingization)
@@ -11,6 +11,7 @@ Currently the following repos are migrated or newly created:
 - datajson_mummy; showcasing a generic database-form.
 
 I will not re-enter all the tutorial-information from json2web, which will still sit in that repo:
+
 <a href="https://github.com/some-avail/json2web" target="_blank">Go to the json2web-repo</a>
 
 To mummify a jester-project take the follow steps:
@@ -25,14 +26,14 @@ To mummify a jester-project take the follow steps:
 - make sure no addons (like ublock) limit your view 
 
 
-### Ad Datajson_mummy
+### About Datajson_mummy
 
 In case of tab-duplication use a tabID (like in datajson_mummy) and set persistence to persistOnDisk because in mummy you must compile for with multi-threading. The futural approach is probably persistInBrowserSessionStorage or something like that.
 
 
-### Ad alacarte/superproject
+### About alacarte/superproject
 
-This project is meant for a threefold goal;
+This project is meant for a threefold goal:
 - enable the usage of super-projects that can call other (sub)projects and form a navigation to these subprojects; however the projects are in sibling-orientation to each other.
 - adjust a sub-project so that it can be called from another sibling-project (here: superproject)
 - make sure the project can still be run independently.
@@ -45,11 +46,12 @@ To realize this approach you must do some adaptations to the subprojects' code:
 - create constants for project and sibling-prefix
 - publicize constants and procs with a * so that they can be called from elsewhere
 
-Then you can simply copy the routes to the super-project.
+After that you can simply copy the routes to the super-project.
 
 
 
-### Still to be done; a starter-project
+### Still to be done
 
--create a starter-project that can be used /copied as template with not much content but with the needed boiler-plate code. This project must be kept up to date. 
+- create a **starter-project** that can be used /copied as template with not much content but with the needed boiler-plate code. This project must be kept up to date. 
+- implement a form of persistInBrowser
 
