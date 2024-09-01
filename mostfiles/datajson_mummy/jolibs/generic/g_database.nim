@@ -14,11 +14,19 @@
  ]#
 
 
-import std/[strutils]
+import std/[strutils, os]
 import db_connector/db_sqlite
-
 import g_tools
+
+
 # import g_templates
+
+
+when fileExists("../../app_globals.nim") or fileExists("app_globals.nim"):
+  import ../../app_globals
+else:
+  echo "This module could not be imported (not found): app_globals.nim"
+
 
 
 type 
@@ -67,11 +75,23 @@ template log(messagest: string) =
 
 proc getDb*: DbConn =
   ## Create a DbConn
-  # let filepathst = "/home/bruik/Bureaublad/nimtest.db"
-  let filepathst = "/media/OnsSpul/1klein/1joris/k1-onderwerpen/computer/Programmeren/nimtaal/jester/freekwensie/mostfiles/freek.db"
-  #let filepathst = "/media/OnsSpul/1klein/1joris/k1-onderwerpen/computer/Programmeren/nimtaal/jester/kjx-srvpc-206.db"
-  #let filepathst = "/home/bruik/.moonchild productions/pale moon/oq1i83z0.default/places.sqlite"
-  open(filepathst, "", "", "")
+
+  when declared(db_pathst):   # from app_globals.nim
+    let filepathst = db_pathst
+  else:
+    # use testing databases
+
+    # let filepathst = "/home/bruik/Bureaublad/nimtest.db"
+    #let filepathst = "/media/OnsSpul/1klein/1joris/k1-onderwerpen/computer/Programmeren/nimtaal/jester/freekwensie/mostfiles/freek.db"
+    let filepathst = "xxxyyy"
+    #let filepathst = "/media/OnsSpul/1klein/1joris/k1-onderwerpen/computer/Programmeren/nimtaal/jester/kjx-srvpc-206.db"
+    #let filepathst = "/home/bruik/.moonchild productions/pale moon/oq1i83z0.default/places.sqlite"
+  if fileExists(filepathst):
+    result = open(filepathst, "", "", "")
+  else:
+    echo "\p***************************************************************"
+    echo ">>>> Database-file could not be found: " & filepathst
+    echo "***************************************************************\p"
 
 
 
@@ -638,7 +658,7 @@ proc idValueExists*(tablenamest, id_fieldst, id_valuest: string): bool =
 when isMainModule:
   #echo readFromParams("mr_data")
   echo "--------------"
-  #echo readFromParams("mr_data", comparetype = compNotSub, fieldvaluesq = @[["Builder", "sung"]])
+  echo readFromParams("mr_data", comparetype = compNotSub, fieldvaluesq = @[["Builder", "sung"]])
   # echo readFromParams("mr_data", @["anID", "Droidname"], ordersq = @["anID"], ordertypest = "DESC")
   #echo readFromParams("mr_data", @["Droidname"], ordersq = @["anID"], ordertypest = "DESC")
   #echo readFromParams("mr_data", ordersq = @["Type", "Weight"], ordertypest = "ASC")
@@ -675,9 +695,10 @@ when isMainModule:
   #echo rowCount("mr_data")
   #echo idValueExists("vacancies", "vacID", "5")
 
-
+#[
   for item in getFieldAndTypeList("vacancies_high_paying", viewAuto):
     echo item[0]
     echo item[1]
     echo "---"
+]#
 
