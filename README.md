@@ -14,6 +14,13 @@ I will not re-enter all the tutorial-information from json2web, which will still
 
 <a href="https://github.com/some-avail/json2web" target="_blank">Go to the json2web-repo</a>
 
+### What's new
+
+- updated datajson_mummy to 11.0; should fix the database-path problem
+
+
+### Mummification of jester-projects
+
 To mummify a jester-project take the follow steps:
 - import the needed mummy modules (mummy, mummy/routers, mummy_utils) and remove jester
 - move the route-parts to separate procs like 
@@ -53,5 +60,5 @@ After that you can simply copy the routes to the super-project.
 ### Still to be done
 
 - create a **starter-project** that can be used /copied as template with not much content but with the needed boiler-plate code. This project must be kept up to date. 
-- implement a form of persistInBrowser
+- implement a form of persistInBrowser (?)
 

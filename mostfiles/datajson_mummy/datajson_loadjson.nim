@@ -54,8 +54,6 @@ const persisttype* = persistOnDisk    # see enum above and module-info
 
 
 # create a table with jnobs, one for every tab
-# (futural multi-user-approach)
-#var jsondefta* {.threadvar.} = initTable[string, JsonNode]()
 when persisttype == persistInMem:
   var jsondefta* = initTable[string, JsonNode]()
 
@@ -63,16 +61,12 @@ when persisttype == persistInMem:
 
 proc initialLoading(parjnob: JsonNode): JsonNode = 
   # custom - load extra public data to the json-object
-  # this is a dummy function for now
   var 
     tablesq: seq[string]
     firstelems_pathsq: seq[string] = @["all web-pages", "first web-page", "web-elements fp", "your-elem-type"]
     newjnob: JsonNode = parjnob
 
   firstelems_pathsq = replaceLastItemOfSeq(firstelems_pathsq, "dropdowns fp")
-  #graftJObjectToTree("All_tables", firstelems_pathsq, newjnob, 
-  #                  createDropdownNodeFromDb("All_tables", "sqlite_master", @["name", "name"], 
-  #                      compString, @[["type", "table"]], @["name"], "ASC"))
   graftJObjectToTree("All_tables", firstelems_pathsq, newjnob, 
                     createDropdownNodeFromDb("All_tables", "sqlite_master", @["name", "name"], 
                         compNotSub, @[["type", "index"],["name", "sqlite"]], @["name"], "ASC"))

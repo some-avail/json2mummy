@@ -45,7 +45,7 @@ import jolibs/generic/[g_db2json, g_json_plus, g_database, g_templates, g_json2h
 
 
 const 
-  versionfl:float = 10.7
+  versionfl:float = 11.0
   project_prefikst = "datajson"
   appnamebriefst = "DJ"
   appnamenormalst = "DataJson"
