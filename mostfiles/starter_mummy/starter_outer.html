@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+
+<!-- project_outer.html  
+      In this page the outer frame is provided. 
+      The inner page is placed in the moustachu-var 
+      controls-group  -->
+
+<html>
+<head>
+
+   <link rel="stylesheet" href="/public/{{project_prefix}}_sheet.css">
+   <script src="/public/{{project_prefix}}_script.js"></script>
+   <title>{{pagetitle}}</title>
+
+</head>
+
+
+<body>
+<div class="row-top">
+  <div class="rtop-left" >{{namelong}}</div>
+  <div class="rtop-mid" >{{namenormal}} {{version}}</div>
+  <div class="rtop-right" >{{loadtime}}</div>
+</div>
+
+
+  {{{controls-group}}}
+
+
+</body>
+</html>
+

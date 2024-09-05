@@ -1,0 +1,45 @@
+<!-- project_inner.html is nested within project_outer.html 
+      by means of the moustachu-variable controls-group in the outer page.
+      In this page the real content is placed. Moustachu-vars have a 
+      double or triple curly brace. -->
+
+
+<div class="row-main">
+  <form id="webbieform" action="/{{project_prefix}}" method="POST" target="{{newtab}}">
+    <div class="col-mid">
+      <br>
+      <textarea name="tab_ID" readonly class="specialfield">{{{tab_id}}}</textarea>
+      <textarea name="curaction" readonly class="specialfield">idle</textarea><br><br>
+
+      <center>
+      <button class="mybuttons" type="button" onclick="butProcedure1()">Action 1</button><br>
+      <button class="mybuttons" type="button" onclick="butProcedure2()">Action 2</button><br>
+      <button class="mybuttons" type="button" onclick="butProcedure3()">Action 3</button><br>
+      </center>
+
+      Status: <br><br>
+      {{{statustext}}}<br><br>
+
+      
+      <div class="mid-top">
+      </div>
+
+
+      <div class= "mid-mid">
+      </div>
+
+    </div>
+    <div class="col-right">
+      <h4>Your app</h4>
+      <br><br>
+      <textarea class = "my_textarea" name="text01">{{text01}}</textarea><br><br>
+      <textarea class = "my_textarea" name="text02">{{text02}}</textarea><br><br>
+      <textarea class = "my_textarea" name="text03">{{text03}}</textarea><br><br>
+      
+
+
+    </div>
+  </form>
+
+</div>
+

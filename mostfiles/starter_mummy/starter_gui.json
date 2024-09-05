@@ -1,0 +1,123 @@
+
+
+
+{
+  "datajson-webcontrols":
+  {
+    "project-properties":
+    {
+      "p-description": "Template project to copy and adapt",
+      "p-prefix": "starter",
+      "p-version": 1.0,
+      "tip-one": "Append abbreviations like fp (first page) to maintain uniqueness of keys",
+      "tip-two": "Arrays dont have to be unique (are not searched for keys from the outside)",
+      "tip-three": "Dont use hyphens in names of controls or elements; not allowed in JS"
+    }
+  },
+  "all web-pages":
+  {
+    "first web-page":
+    {
+      "web-elements fp":
+      {
+        "radio-button-sets fp":
+        {
+          "radiosetexample":
+          [
+            {"name":"rbut1","lab":"this is button one","selected":true},
+            {"name":"rbut2","lab":"this is button two","selected":false},
+            {"name":"rbut3","lab":"and here nr. 3","selected":false}
+          ],
+          "radiosettwo":
+          [
+            {"name":"rabut1","lab":"Bouton un","selected":true},
+            {"name":"rabut2","lab":"Bouton deux","selected":false},
+            {"name":"rabut3","lab":"Bouton trois","selected":false}
+          ]
+        },
+
+      
+        "check-box-sets fp":
+        {
+          "checksetexample":
+          [
+            {"name":"check1","lab":"this is box one","selected":true},
+            {"name":"check2","lab":"this is box two","selected":true},
+            {"name":"check3","lab":"and here box 3","selected":false}
+          ],
+          "checksettwo":
+          [
+            {"name":"chk1","lab":"vinkvakje 1","selected":true},
+            {"name":"chk2","lab":"vinkvakje 2","selected":false},
+            {"name":"chk3","lab":"vinkvakje 3","selected":true}
+          ]
+        },
+        "dropdowns fp":
+        {
+          "dropdownname_01":
+          {
+            "ddlab": "Table:",
+            "ddvalues": 
+              [
+                {"real-value": "some realvalue", "show-value": "this value is shown"},
+                {"real-value": "second realvalue", "show-value": "second value is shown"},
+                {"real-value": "third realvalue", "show-value": "third value is shown"}
+              ]
+          },
+          "dropdownname_02":
+          {
+            "ddlab": "Drop2:",
+            "ddvalues": 
+              [
+                {"real-value": "echte waarde", "show-value": "getoonde waarde 1"},
+                {"real-value": "tweede waarde", "show-value": "getoonde waarde 2"},
+                {"real-value": "derde waarde", "show-value": "getoonde waarde 3"}
+              ]
+          }
+        },
+        "datalists fp":
+        {
+          "my_first_datalist":
+          {
+            "setlabel": "yes",
+            "dl_lab": "Test-label:",
+            "dl_values": 
+              [
+                {"real-value": "echte waarde", "show-value": "getoonde waarde 1"},
+                {"real-value": "tweede waarde", "show-value": "getoonde waarde 2"},
+                {"real-value": "derde waarde", "show-value": "getoonde waarde 3"}
+              ]
+          }
+        },
+        "basic tables fp":
+        {
+          "table_01":
+          {
+            "theader": ["head01","head02","head03","head04"],
+            "tdata":
+            [
+              ["a1","b1","c1","d1"],
+              ["a2","b2","c2","d2"],
+              ["a3","b3","c3","d3"]
+            ]
+          }
+        },
+        "input tables fp (not used currently)":
+        {
+          "model-input-table":
+          {
+            "theader": ["head01","head02","head03","head04"],
+            "inputrow": "basic_input",
+            "tdata":
+            [
+              ["a1","b1","c1","d1"],
+              ["a2","b2","c2","d2"],
+              ["a3","b3","c3","d3"]
+            ]
+          }
+        }
+      }
+    }        
+  }
+}
+
