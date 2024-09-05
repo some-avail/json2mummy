@@ -44,7 +44,7 @@ import jolibs/generic/[g_json_plus, g_templates, g_json2html, g_tools, g_cookie]
 
 
 const 
-  versionfl:float = 1.0
+  versionfl:float = 0.5
   project_prefikst = "starter"
   appnamebriefst = "ST"
   appnamenormalst = "Starter"
@@ -136,6 +136,7 @@ proc getProject(request: Request) =
 
 proc postProject(request: Request)  = 
 
+  # boiler-plate code
   var
     statustekst, righttekst, tempst:string
     innervarob: Context = newContext()  # inner html insertions
@@ -178,6 +179,9 @@ proc postProject(request: Request)  =
   innervarob["linkcolor"] = "red"
 
 
+  # ****************** put your app-logic here *******************
+
+  # some sample logic has been provided
 
 
   if @"curaction" == "do action 1..":
@@ -188,6 +192,8 @@ proc postProject(request: Request)  =
 
   if @"curaction" == "do action 3..":
     discard()
+
+  # ****************** end of app-logic ***************************
 
 
 

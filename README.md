@@ -16,6 +16,7 @@ I will not re-enter all the tutorial-information from json2web, which will still
 
 ### What's new
 
+- initial addition of the starter-app 0.5 (alfa-version; not yet usable)
 - updated datajson_mummy to 11.0; should fix the database-path problem
 
 
