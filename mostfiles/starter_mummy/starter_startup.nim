@@ -38,13 +38,13 @@ import std/[times, json, os, tables, strutils]
 
 import starter_loadjson, starter_logic
 
-import jolibs/generic/[g_json_plus, g_templates, g_json2html, g_tools, g_cookie]
+import jolibs/generic/[g_json_plus, g_templates, g_json2html, g_tools]
 
 
 
 
 const 
-  versionfl:float = 0.5
+  versionfl:float = 0.51
   project_prefikst = "starter"
   appnamebriefst = "ST"
   appnamenormalst = "Starter"
@@ -72,21 +72,6 @@ proc showPage(par_innervarob, par_outervarob: var Context,
 
   return render(readFile(project_prefikst & "_outer.html"), par_outervarob)
 
-
-
-proc runFunctionFromClient*(funcPartsta: OrderedTable[string, string], jnob: JsonNode): string = 
-
-  # run the function
-  if funcPartsta["funcname"] == "dummyPass":
-    result = dummyPass(funcPartsta["newcontent"])
-  #elif funcPartsta["funcname"] == "setDropDown":
-  #  result = setDropDown(jnob, funcPartsta["html-elem-name"], funcPartsta["selected-value"], 
-  #    parseInt(funcPartsta["dd-size"]))
-
-
-#     "funcname:setDropDown++location:inner++varname:dropdown1++param2:dropdownname_01++param3:third realvalue++param4:1", 60);
-# proc setDropDown*(jnob: JsonNode, dropdownnamest, selected_valuest: string, 
-#                     sizeit: int):string = 
 
 
 
@@ -181,36 +166,28 @@ proc postProject(request: Request)  =
 
   # ****************** put your app-logic here *******************
 
+  innervarob["text01"] = @"text01"
+  innervarob["text02"] = @"text02"
+  innervarob["text03"] = @"text03"
+  
   # some sample logic has been provided
 
 
   if @"curaction" == "do action 1..":
+    # reverseString done by javascript; no action needed here
     discard()
 
   if @"curaction" == "do action 2..":
-    discard()
+    # calling a similar function from the nim server-side
+    innervarob["text02"] = reverseString(@"text02")
 
   if @"curaction" == "do action 3..":
-    discard()
+    var wordsq: seq[string] = 
+      @["One sheep", "two sheep", "three sheep"]
+    innervarob["text03"] = cycleSequence(wordsq, @"text03")
+    
 
   # ****************** end of app-logic ***************************
-
-
-
-  # A server-function may have been called from client-side (browser-javascript) by
-  # preparing a cookie for the server (that is here) to pick up and execute.
-  # (what i call a cookie-tunnel)
-  if request.cookies.haskey(project_prefikst & "_run_function"):
-    cookievaluest = request.cookies[project_prefikst & "_run_function"]
-    if cookievaluest != "DISABLED":
-      funcpartsta = getFuncParts(cookievaluest) 
-      locationst = funcpartsta["location"]  # innerhtml-page or outerhtml-page
-      mousvarnamest = funcpartsta["mousvarname"]
-
-      if locationst == "inner":
-        innervarob[mousvarnamest] = runFunctionFromClient(funcpartsta, gui_jnob)
-      elif locationst == "outer":
-        outervarob[mousvarnamest] = runFunctionFromClient(funcpartsta, gui_jnob)
 
 
 
