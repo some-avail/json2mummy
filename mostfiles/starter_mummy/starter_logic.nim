@@ -26,7 +26,8 @@ proc reverseString*(inputst: string): string =
 proc cycleSequence*(listsq: seq[string], currentitemst: string): string = 
 
   #[
-    cycle thru the sequence listsq, starting from currentitemst
+    - return the next item in the sequence listsq, starting from currentitemst
+    - at the last item return to the first one
   ]#
 
 

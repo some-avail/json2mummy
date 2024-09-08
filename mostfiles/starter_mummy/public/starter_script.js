@@ -7,10 +7,15 @@ pickup starts.
 
 let projectprefixjs = "starter"
 
+
+
+// allthoe the cookie-tunnel is deprecated i leave some cookie-functions for reference-purpose on 
+// how to use cookies
+
+//**************************
 function setCookieForSeconds(cName, cValue, forSeconds) {
   document.cookie = cName + "=" + cValue + ";max-age=" + forSeconds  + "; path=/" + projectprefixjs;
 }
-
 
 
 function finalize(){
@@ -26,44 +31,14 @@ function finalize(){
   setCookieForSeconds(projectprefixjs + "_run_function", "DISABLED", 300);  
 }
 
-
-
-function sendFunctionToServer() {
-  setCookieForSeconds(projectprefixjs + "_run_function", 
-    "funcname::dummyPass++location::inner++mousvarname::statustext++newcontent::nieuwe statustekst", 300);
-  finalize();
-}
-
-
 function setMoustachuVar(mousvarjs, contentjs) {
   setCookieForSeconds("project_run_function", 
     "funcname::dummyPass++location::inner++mousvarname::" + mousvarjs + 
     "++newcontent::" + contentjs, 
     300);
-  
   finalize();
 }
-
-function runReverseStringByNim(mousvarjs, contentjs) {
-  setCookieForSeconds(projectprefixjs +"_run_function", 
-    "funcname::starter_logic.reverseString++param++location::inner++mousvarname::text01++" + 
-    "html-elem-name::dropdownname_01++selected-value::third realvalue++dd-size::1",  
-    300);
-  
-  finalize();
-}
-
-
-
-function radiorecord_onchange(valuejs) {
-// write selection-change to status-text
-
-  document.getElementsByName("curaction")[0].value = "reading rec..";
-  
-  setMoustachuVar("statustext", valuejs);
-  // document.getElementsByName("curaction")[0].value = "idle";
-  // alert(valuejs);
- }
+//*****************************
 
 
 
@@ -74,8 +49,6 @@ function reverseString(inputjs) {
   console.log(outputjs);
   return outputjs
 }
-
-
 
 
 function butProcedure1() {
@@ -91,14 +64,11 @@ function butProcedure1() {
 
 
 
-
 function butProcedure2() {
   console.log("testing 123");
   document.getElementsByName("curaction")[0].value = "do action 2..";
   document.forms["webbieform"].submit();
 }
-
-
 
 
 
@@ -109,8 +79,6 @@ function butProcedure3() {
   // document.getElementsByName("curaction")[0].value = "idle";  
   document.forms["webbieform"].submit();
   }
-
-
 
 
 

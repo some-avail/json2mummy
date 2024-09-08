@@ -16,7 +16,7 @@ I will not re-enter all the tutorial-information from json2web, which will still
 
 ### What's new
 
-- initial addition of the starter-app 0.5 (alfa-version; not yet usable)
+- the starter-app 0.52 (beta-version; usable but not yet fully cleaned out of unneeded stuff nor has it been restyled css-wise)
 - updated datajson_mummy to 11.0; should fix the database-path problem
 
 
@@ -33,10 +33,6 @@ To mummify a jester-project take the follow steps:
 - add the mummy-routes
 - make sure no addons (like ublock) limit your view 
 
-
-### About Datajson_mummy
-
-In case of tab-duplication use a tabID (like in datajson_mummy) and set persistence to persistOnDisk because in mummy you must compile for with multi-threading. The futural approach is probably persistInBrowserSessionStorage or something like that.
 
 
 ### About alacarte/superproject
@@ -57,9 +53,31 @@ To realize this approach you must do some adaptations to the subprojects' code:
 After that you can simply copy the routes to the super-project.
 
 
+## About scricon_mummy
+
+Warning:
+The cookie-tunnel-code is deprecated, because one can easily run server-code thru
+the curaction variable . This is a textarea-element that can be set from javascript,
+and can be read on the server after a form-submit to execute the needed server-code.
+
+See starter or datajson for this newer approach.
+
+
+### About Datajson_mummy
+
+In case of tab-duplication use a tabID (like in datajson_mummy) and set persistence to persistOnDisk because in mummy you must compile for with multi-threading. The futural approach is probably persistInBrowserSessionStorage or something like that.
+
+
+
+## About starter_mummy
+
+Starter_mummy that can be used /copied as template with not much content but with the needed boiler-plate code to start a project. 
+
+This project must be kept up to date. 
+
+
 
 ### Still to be done
 
-- create a **starter-project** that can be used /copied as template with not much content but with the needed boiler-plate code. This project must be kept up to date. 
 - implement a form of persistInBrowser (?)
 

@@ -36,7 +36,11 @@
 
 
 import std/[json, tables, os, times, strutils]
-import jolibs/generic/[g_db2json, g_json_plus]
+import jolibs/generic/[g_json_plus]
+
+# only use g_db2json when a database is used
+#import jolibs/generic/[g_db2json, g_json_plus]
+
 
 
 const storednodesdir = "stored_gui_nodes"

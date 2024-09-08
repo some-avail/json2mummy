@@ -12,15 +12,24 @@ in either of two variables (i dont know if they are fully equivalent):
 * variables like @"controlname"
 * request.params["controlname"]
 
-Do not use global vars  or otherwise you can not compile for multi-threading
+Do not use global vars because the are not "gc-safe". GC stands for garbage-collection.
+My (layman-) theory is that all threads have there own garbage-collection.
+When the main thread has nothing to do with other threads globals can gc-ed allright, 
+but when extra threads have been spawned, the gc of different threads gets mixed up 
+concerning the globals, and therefore in that case globals have been forbidden.
+(Allthoe i kinda understand it, i find it a pretty big drawback..)
+
+Without globals you can compile for multi-threading
 with switch --threads:on which is mandatory in mummy (but not in jester)
 
 See also the module projectprefix_loadjson.nim
 Currently --threads :on compiles and runs succesfully under  
-persistence-mode = persistOnDisk in datajson_loadjson.nim. 
+persistence-mode = persistOnDisk in projectprefix_loadjson.nim. 
 See that module for further info.
 
-
+The cookie-tunnel code has been removed because one can easily run server-code thru
+the cur-action variable . This is a textarea element that can be set from javascript,
+and after a form-submit can be read on the server to execute the needed server-code.
 
 
 ADAP HIS
@@ -34,28 +43,25 @@ ADAP FUT
 ]#
 
 import mummy, mummy/routers, mummy_utils, moustachu
-import std/[times, json, os, tables, strutils]
+import std/[times, json, tables, strutils]
 
 import starter_loadjson, starter_logic
 
-import jolibs/generic/[g_json_plus, g_templates, g_json2html, g_tools]
+import jolibs/generic/[g_json_plus, g_json2html]
 
+#import jolibs/generic/[g_json_plus, g_templates, g_json2html, g_tools]
 
 
 
 const 
-  versionfl:float = 0.51
+  versionfl:float = 0.52
   project_prefikst = "starter"
   appnamebriefst = "ST"
   appnamenormalst = "Starter"
   appnamelongst = "Starter_template"
   appnamesuffikst = " showcase"
   portnumberit = 5180
-  # Make sure to get/show all elements that you are referring to, 
-  # or crashes may occur
-  showelems = showEntryFilterRadio
 
-  firstelems_pathst = @["all web-pages", "first web-page", "web-elements fp"]
 
 
 
@@ -89,12 +95,14 @@ proc sayHello(request: Request) =
 
 
 
+
 proc getProject(request: Request) = 
-#proc getStarter(request: Request) {.gcsafe.} = 
+
+#to understand why a project is not gcsafe, add the pragma {.gcsafe.} to get more info
+#proc getProject(request: Request) {.gcsafe.} = 
 
 
   var
-    statustekst:string
     innervarob: Context = newContext()  # inner html insertions
     outervarob: Context = newContext()   # outer html insertions
 
@@ -113,7 +121,6 @@ proc getProject(request: Request) =
 
   innervarob["project_prefix"] = project_prefikst  
   
-
   resp showPage(innervarob, outervarob)
 
 
@@ -123,11 +130,8 @@ proc postProject(request: Request)  =
 
   # boiler-plate code
   var
-    statustekst, righttekst, tempst:string
     innervarob: Context = newContext()  # inner html insertions
     outervarob: Context = newContext()   # outer html insertions
-    cookievaluest, locationst, mousvarnamest: string
-    funcpartsta =  initOrderedTable[string, string]()
     firstelems_pathsq: seq[string] = @["all web-pages", "first web-page", "web-elements fp", "your-element"]
     gui_jnob: JsonNode
     tabidst: string = ""
@@ -174,7 +178,7 @@ proc postProject(request: Request)  =
 
 
   if @"curaction" == "do action 1..":
-    # reverseString done by javascript; no action needed here
+    # reverseString done by javascript; no action needed here; see project_script.js
     discard()
 
   if @"curaction" == "do action 2..":
@@ -182,8 +186,8 @@ proc postProject(request: Request)  =
     innervarob["text02"] = reverseString(@"text02")
 
   if @"curaction" == "do action 3..":
-    var wordsq: seq[string] = 
-      @["One sheep", "two sheep", "three sheep"]
+    # cycle thru words
+    var wordsq: seq[string] = @["One sheep", "two sheep", "three sheep"]
     innervarob["text03"] = cycleSequence(wordsq, @"text03")
     
 
