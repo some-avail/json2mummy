@@ -75,7 +75,7 @@ In case of tab-duplication use a tabID (like in datajson_mummy) and set persiste
 
 
 
-<a name="about-starter_mummy">### About Datajson_mummy</a>
+### <a name="about-starter_mummy">About starter_mummy</a>
 
 
 Starter_mummy that can be used /copied as template with not much content but with the needed boiler-plate code to start a project. Extra info can be found on top of the starter_startup.nim-file. 
