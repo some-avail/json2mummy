@@ -16,7 +16,8 @@ I will not re-enter all the tutorial-information from json2web, which will still
 
 <a href="https://github.com/some-avail/json2web" target="_blank">Go to the json2web-repo</a>
 
-[Go to the Starter-template](about-starter_mummy)
+[Go to the Starter-template](#about-starter_mummy)
+
 
 
 ### What's new
