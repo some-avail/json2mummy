@@ -15,6 +15,7 @@ Currently the following repos have been migrated or newly created:
 I will not re-enter all the tutorial-information from json2web, which will still sit in that repo:
 
 <a href="https://github.com/some-avail/json2web" target="_blank">Go to the json2web-repo</a>
+
 [Go to the Starter-template](about-starter_mummy)
 
 
@@ -73,7 +74,8 @@ In case of tab-duplication use a tabID (like in datajson_mummy) and set persiste
 
 
 
-### About starter_mummy
+<a name="about-starter_mummy">### About Datajson_mummy</a>
+
 
 Starter_mummy that can be used /copied as template with not much content but with the needed boiler-plate code to start a project. Extra info can be found on top of the starter_startup.nim-file. 
 
