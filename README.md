@@ -83,6 +83,11 @@ Starter_mummy that can be used /copied as template with not much content but wit
 Download the code and compile with :
 nim c -r --mm:orc --threads:on starter_startup.nim 
 
+Run with:
+
+[http://localhost:5180/starter](http://localhost:5180/starter)
+
+
 If it works recopy the starter-project and adjust the project-prefix "starter" to your own project and update the name on all relevant locations in the code.
 
 
