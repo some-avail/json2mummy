@@ -1,5 +1,6 @@
 ## json2mummy - re-implementation of json2web in mummy
 
+![](mostfiles/z_pics/starter_mummy.png)
 
 This repo features the migration of some json2web-projects to mummy. It has been made because the jester-repo has become low-maintained, and also it is not clear if some will take up the project again. 
 
@@ -9,14 +10,17 @@ Currently the following repos have been migrated or newly created:
 - alacarte/superproject; showcasing how to create a collection-project (thru siblingization)
 - scricon_mummy; controls with some basic scripting.
 - datajson_mummy; showcasing a generic database-form.
+- starter_mummy; a minimal project-template to start from
 
 I will not re-enter all the tutorial-information from json2web, which will still sit in that repo:
 
 <a href="https://github.com/some-avail/json2web" target="_blank">Go to the json2web-repo</a>
+[Go to the Starter-template](about-starter_mummy)
+
 
 ### What's new
 
-- the starter-app 0.52 (beta-version; usable but not yet fully cleaned out of unneeded stuff nor has it been restyled css-wise)
+- the starter-app 1.0 - create your app based on this template.
 - updated datajson_mummy to 11.0; should fix the database-path problem
 
 
@@ -53,7 +57,7 @@ To realize this approach you must do some adaptations to the subprojects' code:
 After that you can simply copy the routes to the super-project.
 
 
-## About scricon_mummy
+### About scricon_mummy
 
 Warning:
 The cookie-tunnel-code is deprecated, because one can easily run server-code thru
@@ -69,15 +73,22 @@ In case of tab-duplication use a tabID (like in datajson_mummy) and set persiste
 
 
 
-## About starter_mummy
+### About starter_mummy
 
-Starter_mummy that can be used /copied as template with not much content but with the needed boiler-plate code to start a project. 
+Starter_mummy that can be used /copied as template with not much content but with the needed boiler-plate code to start a project. Extra info can be found on top of the starter_startup.nim-file. 
+
+Download the code and compile with :
+nim c -r --mm:orc --threads:on starter_startup.nim 
+
+If it works recopy the starter-project and adjust the project-prefix "starter" to your own project and update the name on all relevant locations in the code.
+
 
 This project must be kept up to date. 
 
 
 
+
 ### Still to be done
 
-- implement a form of persistInBrowser (?)
+- implement a form of persistInBrowser
 

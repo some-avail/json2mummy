@@ -29,8 +29,6 @@ proc cycleSequence*(listsq: seq[string], currentitemst: string): string =
     - return the next item in the sequence listsq, starting from currentitemst
     - at the last item return to the first one
   ]#
-
-
   result = listsq[0]
   for it, itemst in listsq:
     #echo $it
@@ -39,6 +37,7 @@ proc cycleSequence*(listsq: seq[string], currentitemst: string): string =
         result = listsq[it + 1]
       else:
         result = listsq[0]
+
 
 
 

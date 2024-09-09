@@ -1,13 +1,13 @@
 
 
-#[ Sample-project "controls" to learn how to use jester, moustachu and
-g_html_json (html-elements generated from a json-definition-file).
+#[ Sample-project "controls" to learn how to use mummy, moustachu and
+my json-modules (html-elements generated from a json-definition-file).
 
 Beware of the fact  that there are two kinds of variables:
 -moustachu-variables in the html-code, in which the generated html-controls are 
 substituted. Designated with {{}} or {{{}}}. Sometimes two braces are enough,
 but it is saver to use three to avoid premature evaluation.
--control-variables used by jester. Jester reads control-states and puts them 
+-control-variables used by jester / mummy. Jester/mummy reads control-states and puts them 
 in either of two variables (i dont know if they are fully equivalent):
 * variables like @"controlname"
 * request.params["controlname"]
@@ -54,7 +54,7 @@ import jolibs/generic/[g_json_plus, g_json2html]
 
 
 const 
-  versionfl:float = 0.52
+  versionfl:float = 1.0
   project_prefikst = "starter"
   appnamebriefst = "ST"
   appnamenormalst = "Starter"
