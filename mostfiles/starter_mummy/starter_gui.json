@@ -56,7 +56,7 @@
         {
           "dropdownname_01":
           {
-            "ddlab": "Table:",
+            "ddlab": "Example:",
             "ddvalues": 
               [
                 {"real-value": "some realvalue", "show-value": "this value is shown"},

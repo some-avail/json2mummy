@@ -47,14 +47,14 @@ import std/[times, json, tables, strutils]
 
 import starter_loadjson, starter_logic
 
-import jolibs/generic/[g_json_plus, g_json2html]
+import jolibs/generic/[g_json_plus, g_json2html, g_nim2json]
 
 #import jolibs/generic/[g_json_plus, g_templates, g_json2html, g_tools]
 
 
 
 const 
-  versionfl:float = 1.0
+  versionfl:float = 1.15
   project_prefikst = "starter"
   appnamebriefst = "ST"
   appnamenormalst = "Starter"
@@ -121,6 +121,17 @@ proc getProject(request: Request) =
 
   innervarob["project_prefix"] = project_prefikst  
   
+
+
+  # ****************** put your app-logic here *******************
+
+  # set the dropdown from the def in the initialjnob based on file: starter_gui.json
+  innervarob["dropdown1"] = setDropDown(initialjnob, "dropdownname_01", "some realvalue", 1)
+
+  # ****************** end of app-logic ***************************
+
+
+
   resp showPage(innervarob, outervarob)
 
 
@@ -132,7 +143,7 @@ proc postProject(request: Request)  =
   var
     innervarob: Context = newContext()  # inner html insertions
     outervarob: Context = newContext()   # outer html insertions
-    firstelems_pathsq: seq[string] = @["all web-pages", "first web-page", "web-elements fp", "your-element"]
+    firstelems_pathsq: seq[string] = @["all web-pages", "first web-page", "web-elements fp"]
     gui_jnob: JsonNode
     tabidst: string = ""
 
@@ -170,11 +181,13 @@ proc postProject(request: Request)  =
 
   # ****************** put your app-logic here *******************
 
+  # some sample logic has been provided
+
+
+  # take over the previous values
   innervarob["text01"] = @"text01"
   innervarob["text02"] = @"text02"
   innervarob["text03"] = @"text03"
-  
-  # some sample logic has been provided
 
 
   if @"curaction" == "do action 1..":
@@ -189,13 +202,45 @@ proc postProject(request: Request)  =
     # cycle thru words
     var wordsq: seq[string] = @["One sheep", "two sheep", "three sheep"]
     innervarob["text03"] = cycleSequence(wordsq, @"text03")
+  
+  if @"curaction" == "do action 4..":
+
+    # reload the dropdown with numbers
+
+    # set the path in the json-tree to the dropdowns-section
+    var pathsq = firstelems_pathsq & @["dropdowns fp"]
     
+    if "a" in @"dropdownname_01":
+      # ----load the numbers-----
+
+      # delete the original dropdown-def-node in the json-file
+      pruneJnodesFromTree(gui_jnob, pathsq, @["dropdownname_01"])
+
+      # create an new jnob with the numbers
+      var newjnob = createDropdownNodeFromSeq("dropdownname_01", "Sample dropdown", @[["1", "1"], ["2", "2"], ["3", "3"], ["4", "4"], ["5", "5"]])
+
+      # append the new jnob to the existing one
+      graftJObjectToTree("dropdownname_01", pathsq, gui_jnob, newjnob)
+
+      # set the new dropdown-list
+      innervarob["dropdown1"] = setDropDown(gui_jnob, "dropdownname_01", "1", 1)
+
+    else:   # restore previous dropdown
+      innervarob["dropdown1"] = setDropDown(gui_jnob, "dropdownname_01", @"dropdownname_01", 1)
+
+  else:   # restore previous dropdown
+    innervarob["dropdown1"] = setDropDown(gui_jnob, "dropdownname_01", @"dropdownname_01", 1)
+
+  if @"curaction" == "set status dd1..":
+    innervarob["statustext"] = @"dropdownname_01"
+
 
   # ****************** end of app-logic ***************************
 
 
 
   when persisttype != persistNot:
+    # write the current page-layout to the jnob belonging to this tabID
     writeStoredNode(tabidst, gui_jnob)
 
   resp showPage(innervarob, outervarob)
