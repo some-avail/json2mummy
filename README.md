@@ -22,7 +22,7 @@ I will not re-enter all the tutorial-information from json2web, which will still
 
 ### What's new
 
-- the starter-app 1.0 - create your app based on this template.
+- the starter-app 1.15 - create your app based on this template.
 - updated datajson_mummy to 11.0; should fix the database-path problem
 
 
