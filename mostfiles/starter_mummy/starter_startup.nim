@@ -43,7 +43,7 @@ ADAP FUT
 ]#
 
 import mummy, mummy/routers, mummy_utils, moustachu
-import std/[times, json, tables, strutils]
+import std/[times, json, tables, strutils, os, locks]
 
 import starter_loadjson, starter_logic
 
@@ -54,7 +54,7 @@ import jolibs/generic/[g_json_plus, g_json2html, g_nim2json]
 
 
 const 
-  versionfl:float = 1.15
+  versionfl:float = 1.17
   project_prefikst = "starter"
   appnamebriefst = "ST"
   appnamenormalst = "Starter"
@@ -62,8 +62,13 @@ const
   appnamesuffikst = " showcase"
   portnumberit = 5180
 
+# ~~~~~~~locking preparation ~~~~~~~~~~~~~~~~~
+var
+  lock: Lock
+  globalvarst: string
 
-
+initLock(lock)
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
 proc showPage(par_innervarob, par_outervarob: var Context, 
@@ -128,8 +133,13 @@ proc getProject(request: Request) =
   # set the dropdown from the def in the initialjnob based on file: starter_gui.json
   innervarob["dropdown1"] = setDropDown(initialjnob, "dropdownname_01", "some realvalue", 1)
 
-  # ****************** end of app-logic ***************************
 
+  # write to the global var globalvarst with locking
+  {.gcsafe.}:
+    withLock lock:
+      globalvarst = "globalvarst is a usable global var because of locking"
+      innervarob["statustext"] = globalvarst
+  # ****************** end of app-logic ***************************
 
 
   resp showPage(innervarob, outervarob)
@@ -179,7 +189,7 @@ proc postProject(request: Request)  =
   innervarob["linkcolor"] = "red"
 
 
-  # ****************** put your app-logic here *******************
+  # ****************** put your app-logic here ***********************************
 
   # some sample logic has been provided
 
@@ -198,10 +208,23 @@ proc postProject(request: Request)  =
     # calling a similar function from the nim server-side
     innervarob["text02"] = reverseString(@"text02")
 
+    # update globalvarst for testing the locking of global vars
+    {.gcsafe.}:
+      withLock lock:
+        globalvarst = "globalvarst is changed"
+        innervarob["statustext"] = globalvarst
+
+
   if @"curaction" == "do action 3..":
     # cycle thru words
-    var wordsq: seq[string] = @["One sheep", "two sheep", "three sheep"]
-    innervarob["text03"] = cycleSequence(wordsq, @"text03")
+    var testMultiThreadingbo: bool = false    
+    if not testMultiThreadingbo:
+      var wordsq: seq[string] = @["One sheep", "two sheep", "three sheep"]
+      innervarob["text03"] = cycleSequence(wordsq, @"text03")
+    else:   # set above var to true, open two tabs and see they are sleeping parallel (they do)
+      sleep(8000)
+      innervarob["statustext"] = "I am awake after 8 seconds..."
+
   
   if @"curaction" == "do action 4..":
 
