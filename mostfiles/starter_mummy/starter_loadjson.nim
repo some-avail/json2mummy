@@ -30,7 +30,6 @@
     -leaving the project-specific code in projprefix_loadjson
     -moving the generic code to g_loadjson.nim
 
-
  ]#
 
 

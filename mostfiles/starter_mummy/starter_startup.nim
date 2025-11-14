@@ -17,7 +17,7 @@ My (layman-) theory is that all threads have there own garbage-collection.
 When the main thread has nothing to do with other threads globals can gc-ed allright, 
 but when extra threads have been spawned, the gc of different threads gets mixed up 
 concerning the globals, and therefore in that case globals have been forbidden.
-(Allthoe i kinda understand it, i find it a pretty big drawback..)
+(use locks for careful use of globals)
 
 Without globals you can compile for multi-threading
 with switch --threads:on which is mandatory in mummy (but not in jester)
@@ -38,11 +38,17 @@ ADAP HIS
 ADAP NOW
 
 ADAP FUT
-- implement persistInBrowser to avoid server-load
+- implement persistInLockedMem
+
+ABORT
+x- implement persistInBrowser
+
 
 ]#
 
 import mummy, mummy/routers, mummy_utils, moustachu
+#import mummy, mummy/routers, moustachu
+
 import std/[times, json, tables, strutils, os, locks]
 
 import starter_loadjson, starter_logic
@@ -54,7 +60,7 @@ import jolibs/generic/[g_json_plus, g_json2html, g_nim2json]
 
 
 const 
-  versionfl:float = 1.17
+  versionfl:float = 1.19
   project_prefikst = "starter"
   appnamebriefst = "ST"
   appnamenormalst = "Starter"
@@ -63,12 +69,23 @@ const
   portnumberit = 5180
 
 # ~~~~~~~locking preparation ~~~~~~~~~~~~~~~~~
+
+# After the chat-example in mummy i have created this sample-code for using a global var.
+# It compiles and works apperently.
+# Remarks:
+# - Use globals not as working-vars but only as end-result-vars to put in the 
+# result of previous cyles etc.
+# - work with tabIDs and tables if you want to link the data to a tab
+
 var
   lock: Lock
   globalvarst: string
 
+  # guard-pragma still not understood
+  #globalvarst {.guard: lock.}: string
+
 initLock(lock)
-# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
 proc showPage(par_innervarob, par_outervarob: var Context, 
@@ -89,21 +106,27 @@ proc showPage(par_innervarob, par_outervarob: var Context,
 # ************************ PAGE-HANDLERS STARTING HERE ****************************************
 
 proc getRoot(request: Request) = 
-  # retrieve the json-file
+  var headers: HttpHeaders
+  headers["Content-Type"] = "text/plain"
 
-  resp "Type: localhost:" & $portnumberit & "/" & project_prefikst
+  const respondst = "Type: localhost:" & $portnumberit & "/" & project_prefikst
+  request.respond(204, headers, respondst)
 
-
+  
 
 proc sayHello(request: Request) = 
-  resp "Hello world"
+  const respondst = "Hello world"
+  var headers: HttpHeaders
+  headers["Content-Type"] = "text/plain"
+
+  request.respond(200, headers, respondst)
 
 
 
 
 proc getProject(request: Request) = 
 
-#to understand why a project is not gcsafe, add the pragma {.gcsafe.} to get more info
+# ?? to understand why a project is not gcsafe, add the pragma {.gcsafe.} to get more info
 #proc getProject(request: Request) {.gcsafe.} = 
 
 
@@ -139,10 +162,15 @@ proc getProject(request: Request) =
     withLock lock:
       globalvarst = "globalvarst is a usable global var because of locking"
       innervarob["statustext"] = globalvarst
+
+
   # ****************** end of app-logic ***************************
 
 
-  resp showPage(innervarob, outervarob)
+  let respondst = showPage(innervarob, outervarob)
+  var headers: HttpHeaders
+  headers["Content-Type"] = "text/html"
+  request.respond(200, headers, respondst)
 
 
 
@@ -165,9 +193,11 @@ proc postProject(request: Request)  =
       if theTimeIsRight():
         deleteExpiredFromAccessBook()
     if len(@"tab_ID") == 0:
+    #if len(request.queryparams("tab_ID")) == 0:
       tabidst = genTabId()
     else:
       tabidst = @"tab_ID"
+      #tabidst = request.queryparams("tab_ID")
 
     gui_jnob = readStoredNode(tabidst, project_prefikst)
     innervarob["tab_id"] = tabidst
@@ -189,6 +219,7 @@ proc postProject(request: Request)  =
   innervarob["linkcolor"] = "red"
 
 
+
   # ****************** put your app-logic here ***********************************
 
   # some sample logic has been provided
@@ -204,6 +235,8 @@ proc postProject(request: Request)  =
     # reverseString done by javascript; no action needed here; see project_script.js
     discard()
 
+
+
   if @"curaction" == "do action 2..":
     # calling a similar function from the nim server-side
     innervarob["text02"] = reverseString(@"text02")
@@ -211,16 +244,21 @@ proc postProject(request: Request)  =
     # update globalvarst for testing the locking of global vars
     {.gcsafe.}:
       withLock lock:
-        globalvarst = "globalvarst is changed"
+        globalvarst = "globalvarst is: " & @"text02"
         innervarob["statustext"] = globalvarst
 
 
   if @"curaction" == "do action 3..":
     # cycle thru words
-    var testMultiThreadingbo: bool = false    
+    var testMultiThreadingbo: bool = true    
     if not testMultiThreadingbo:
       var wordsq: seq[string] = @["One sheep", "two sheep", "three sheep"]
       innervarob["text03"] = cycleSequence(wordsq, @"text03")
+      {.gcsafe.}:
+        withLock lock:
+          innervarob["statustext"] = globalvarst
+
+
     else:   # set above var to true, open two tabs and see they are sleeping parallel (they do)
       sleep(8000)
       innervarob["statustext"] = "I am awake after 8 seconds..."
@@ -236,7 +274,7 @@ proc postProject(request: Request)  =
     if "a" in @"dropdownname_01":
       # ----load the numbers-----
 
-      # delete the original dropdown-def-node in the json-file
+      # delete the original dropdown-def-node in the json-object
       pruneJnodesFromTree(gui_jnob, pathsq, @["dropdownname_01"])
 
       # create an new jnob with the numbers
@@ -266,7 +304,11 @@ proc postProject(request: Request)  =
     # write the current page-layout to the jnob belonging to this tabID
     writeStoredNode(tabidst, gui_jnob)
 
-  resp showPage(innervarob, outervarob)
+
+  let respondst = showPage(innervarob, outervarob)
+  var headers: HttpHeaders
+  headers["Content-Type"] = "text/html"
+  request.respond(200, headers, respondst)
 
 
 
