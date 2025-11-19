@@ -60,7 +60,7 @@ import jolibs/generic/[g_json_plus, g_json2html, g_nim2json]
 
 
 const 
-  versionfl:float = 1.19
+  versionfl:float = 1.20
   project_prefikst = "starter"
   appnamebriefst = "ST"
   appnamenormalst = "Starter"
@@ -78,13 +78,13 @@ const
 # - work with tabIDs and tables if you want to link the data to a tab
 
 var
-  lock: Lock
+  mylock: Lock
   globalvarst: string
 
-  # guard-pragma still not understood
-  #globalvarst {.guard: lock.}: string
+  # guard-pragma (according to an AI) in-necesitates individual locks of the guarded variable.
+  #globalvarst {.guard: mylock.}: string
 
-initLock(lock)
+initLock(mylock)
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
@@ -124,7 +124,7 @@ proc sayHello(request: Request) =
 
 
 
-proc getProject(request: Request) = 
+proc getProject(request: Request) {.gcsafe.} = 
 
 # ?? to understand why a project is not gcsafe, add the pragma {.gcsafe.} to get more info
 #proc getProject(request: Request) {.gcsafe.} = 
@@ -159,7 +159,7 @@ proc getProject(request: Request) =
 
   # write to the global var globalvarst with locking
   {.gcsafe.}:
-    withLock lock:
+    withLock mylock:
       globalvarst = "globalvarst is a usable global var because of locking"
       innervarob["statustext"] = globalvarst
 
@@ -175,7 +175,7 @@ proc getProject(request: Request) =
 
 
 
-proc postProject(request: Request)  = 
+proc postProject(request: Request) {.gcsafe.} = 
 
   # boiler-plate code
   var
@@ -243,7 +243,7 @@ proc postProject(request: Request)  =
 
     # update globalvarst for testing the locking of global vars
     {.gcsafe.}:
-      withLock lock:
+      withLock mylock:
         globalvarst = "globalvarst is: " & @"text02"
         innervarob["statustext"] = globalvarst
 
@@ -255,7 +255,7 @@ proc postProject(request: Request)  =
       var wordsq: seq[string] = @["One sheep", "two sheep", "three sheep"]
       innervarob["text03"] = cycleSequence(wordsq, @"text03")
       {.gcsafe.}:
-        withLock lock:
+        withLock mylock:
           innervarob["statustext"] = globalvarst
 
 
@@ -303,6 +303,7 @@ proc postProject(request: Request)  =
   when persisttype != persistNot:
     # write the current page-layout to the jnob belonging to this tabID
     writeStoredNode(tabidst, gui_jnob)
+
 
 
   let respondst = showPage(innervarob, outervarob)

@@ -34,12 +34,11 @@
 
 
 
-import std/[json, tables, os, times, strutils]
+import std/[json, tables, os, times, strutils, locks]
 import jolibs/generic/[g_json_plus]
 
 # only use g_db2json when a database is used
 #import jolibs/generic/[g_db2json, g_json_plus]
-
 
 
 const storednodesdir = "stored_gui_nodes"
@@ -47,7 +46,7 @@ const storednodesdir = "stored_gui_nodes"
 let durob = initDuration(hours = 6)
 #let durob = initDuration(minutes = 30)
 
-let versionfl: float = 0.3
+let versionfl: float = 0.4
 
 
 
@@ -57,14 +56,41 @@ type
     persistInMem
     persistOnDisk
 
-#const persisttype* = persistInMem    # see enum above and module-info
-const persisttype* = persistOnDisk    # see enum above and module-info
+const persisttype* = persistInMem    # see enum above and module-info
+#const persisttype* = persistOnDisk    # see enum above and module-info
 
+var liblock: Lock
+initLock(liblock)
 
 
 # create a table with jnobs, one for every tab
 when persisttype == persistInMem:
-  var jsondefta* = initTable[string, JsonNode]()
+  var jsondefta = initTable[string, JsonNode]()
+
+
+
+#[
+proc addOrUpdateDefTable*(jsondefta: var Table[string, JsonNode]; nodeob: JsonNode; tabidst: string) = 
+  # gc-safe operations; add + update
+  {.gcsafe.}:  
+    withLock liblock:  
+      jsondefta[tabidst] = nodeob
+
+proc deleteDefTable*(jsondefta: var Table[string, JsonNode]; tabidst: string) =
+# gc-safe operations; delete
+  {.gcsafe.}:  
+    withLock liblock:
+      if jsondefta.hasKey(tabidst):
+        jsondefta.del(tabidst)
+
+
+proc readDefTable*(jsondefta: var Table[string, JsonNode]; tabidst: string) =
+# gc-safe operations; delete
+  {.gcsafe.}:  
+    withLock liblock:
+      if jsondefta.hasKey(tabidst):
+        jsondefta[tabidst]
+]#
 
 
 
@@ -73,7 +99,6 @@ proc initialLoading(parjnob: JsonNode): JsonNode =
   custom - load extra public data to the json-object
   This is the only custom / project-specific function in this module.
   Currently not used; it passes the jnob thru.
-  
   ]#
 
 
@@ -105,18 +130,18 @@ proc readInitialNode*(proj_prefikst: string): JsonNode =
 
 
 
-
-
 proc readStoredNode*(tabIDst, project_prefikst: string): JsonNode = 
 
   var filepathst: string
 
 
   when persisttype == persistInMem:
-    if not jsondefta.hasKey(tabIDst):
-        jsondefta.add(tabIDst, readInitialNode(project_prefikst))
-        #echo "====*******========************======="
-    result = jsondefta[tabIDst]
+    {.gcsafe.}:  
+      withLock liblock:  
+        if not jsondefta.hasKey(tabIDst):
+          jsondefta.add(tabIDst, readInitialNode(project_prefikst))
+          #echo "====*******========************======="
+        result = jsondefta[tabIDst]
 
   elif persisttype == persistOnDisk:
     filepathst = storednodesdir / tabIDst & ".json"
@@ -187,7 +212,12 @@ proc writeStoredNode*(tabIDst: string, storedjnob: JsonNode) =
 
   when persisttype == persistInMem:
     # store in table of json-nodes
-    jsondefta[tabIDst] = storedjnob
+    {.gcsafe.}:
+      withLock liblock:
+        jsondefta[tabIDst] = storedjnob
+
+    #jsondefta[tabIDst] = storedjnob
+
   elif persisttype == persistOnDisk:
     #then serialize with pretty and write to file
     filepathst = storednodesdir / tabIDst & ".json"
