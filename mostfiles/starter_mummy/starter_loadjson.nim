@@ -17,8 +17,11 @@
   Stored node (in mem or on disk):
   In this all tab-specific changes are stored, so 
   that the state of the tab's gui is saved. 
-  When saved in memory this breaks multi-threading 
-  because of a global var.
+  When saved in memory this breaks no longer 
+  multi-threading because of a global var,
+  since now official locking-mechanisms are used.
+  (always use withlock for all global heap-structure-ops, 
+  preferably use pre-made operations to minimize errors).
   When saved on disk the global var is omitted and 
   you can compile with multi-threading.
 
@@ -26,12 +29,12 @@
   behaviour.
 
   ADAP FUT:
+  -implement periodical clearance of jsondefta also when using memory aot disk.
   -refactor this module by:
     -leaving the project-specific code in projprefix_loadjson
     -moving the generic code to g_loadjson.nim
 
  ]#
-
 
 
 import std/[json, tables, os, times, strutils, locks]
@@ -69,29 +72,45 @@ when persisttype == persistInMem:
 
 
 
+
+proc addOrUpdateDefTable(jsondefta: var Table[string, JsonNode]; nodeob: JsonNode; tabidst: string) = 
+  # gc-safe operations; add or update
+  # do it present or not
+  withLock liblock:
+    jsondefta[tabidst] = nodeob
+
+proc addDefTable(jsondefta: var Table[string, JsonNode]; nodeob: JsonNode; tabidst: string) = 
+  # gc-safe operations; add
+  # only if not yet present
+  withLock liblock:
+    if not jsondefta.hasKey(tabidst):
+      jsondefta[tabidst] = nodeob
+
+
 #[
-proc addOrUpdateDefTable*(jsondefta: var Table[string, JsonNode]; nodeob: JsonNode; tabidst: string) = 
-  # gc-safe operations; add + update
-  {.gcsafe.}:  
-    withLock liblock:  
+#  BELOW PROCS ARE NOT YET USED
+
+proc updateDefTable*(jsondefta: var Table[string, JsonNode]; nodeob: JsonNode; tabidst: string) = 
+  # gc-safe operations; update
+  # only if present
+  withLock liblock:
+    if jsondefta.hasKey(tabidst):
       jsondefta[tabidst] = nodeob
 
 proc deleteDefTable*(jsondefta: var Table[string, JsonNode]; tabidst: string) =
-# gc-safe operations; delete
-  {.gcsafe.}:  
-    withLock liblock:
-      if jsondefta.hasKey(tabidst):
-        jsondefta.del(tabidst)
+  # gc-safe operations; delete
+  withLock liblock:
+    if jsondefta.hasKey(tabidst):
+      jsondefta.del(tabidst)
 
-
-proc readDefTable*(jsondefta: var Table[string, JsonNode]; tabidst: string) =
+proc readDefTable*(jsondefta: var Table[string, JsonNode]; tabidst: string): JsonNode =
 # gc-safe operations; delete
-  {.gcsafe.}:  
-    withLock liblock:
-      if jsondefta.hasKey(tabidst):
-        jsondefta[tabidst]
+  withLock liblock:
+    if jsondefta.hasKey(tabidst):
+      result = jsondefta[tabidst]
+    else:
+      result = newJNull()
 ]#
-
 
 
 proc initialLoading(parjnob: JsonNode): JsonNode = 
@@ -130,18 +149,16 @@ proc readInitialNode*(proj_prefikst: string): JsonNode =
 
 
 
-proc readStoredNode*(tabIDst, project_prefikst: string): JsonNode = 
+proc readStoredNode*(tabIDst, project_prefikst: string): JsonNode  = 
 
   var filepathst: string
 
 
   when persisttype == persistInMem:
-    {.gcsafe.}:  
-      withLock liblock:  
-        if not jsondefta.hasKey(tabIDst):
-          jsondefta.add(tabIDst, readInitialNode(project_prefikst))
-          #echo "====*******========************======="
-        result = jsondefta[tabIDst]
+
+    {.gcsafe.}:
+      addDefTable(jsondefta, readInitialNode(project_prefikst), tabIDst)  #   only if not present
+      result = jsondefta[tabIDst]
 
   elif persisttype == persistOnDisk:
     filepathst = storednodesdir / tabIDst & ".json"
@@ -213,10 +230,7 @@ proc writeStoredNode*(tabIDst: string, storedjnob: JsonNode) =
   when persisttype == persistInMem:
     # store in table of json-nodes
     {.gcsafe.}:
-      withLock liblock:
-        jsondefta[tabIDst] = storedjnob
-
-    #jsondefta[tabIDst] = storedjnob
+      addOrUpdateDefTable(jsondefta, storedjnob, tabIDst)   # existing or not
 
   elif persisttype == persistOnDisk:
     #then serialize with pretty and write to file

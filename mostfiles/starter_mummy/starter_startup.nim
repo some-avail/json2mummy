@@ -60,7 +60,7 @@ import jolibs/generic/[g_json_plus, g_json2html, g_nim2json]
 
 
 const 
-  versionfl:float = 1.20
+  versionfl:float = 1.25
   project_prefikst = "starter"
   appnamebriefst = "ST"
   appnamenormalst = "Starter"
