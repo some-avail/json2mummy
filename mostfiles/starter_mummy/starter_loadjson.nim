@@ -49,7 +49,7 @@ const storednodesdir = "stored_gui_nodes"
 let durob = initDuration(hours = 6)
 #let durob = initDuration(minutes = 30)
 
-let versionfl: float = 0.4
+let versionfl: float = 0.41
 
 
 
@@ -67,9 +67,8 @@ initLock(liblock)
 
 
 # create a table with jnobs, one for every tab
-when persisttype == persistInMem:
-  var jsondefta = initTable[string, JsonNode]()
-
+#when persisttype == persistInMem:
+var jsondefta = initTable[string, JsonNode]()
 
 
 
@@ -154,7 +153,7 @@ proc readStoredNode*(tabIDst, project_prefikst: string): JsonNode  =
   var filepathst: string
 
 
-  when persisttype == persistInMem:
+  if persisttype == persistInMem:
 
     {.gcsafe.}:
       addDefTable(jsondefta, readInitialNode(project_prefikst), tabIDst)  #   only if not present
@@ -227,7 +226,7 @@ proc writeStoredNode*(tabIDst: string, storedjnob: JsonNode) =
   
   var filepathst: string
 
-  when persisttype == persistInMem:
+  if persisttype == persistInMem:
     # store in table of json-nodes
     {.gcsafe.}:
       addOrUpdateDefTable(jsondefta, storedjnob, tabIDst)   # existing or not
