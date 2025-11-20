@@ -49,7 +49,7 @@ const storednodesdir = "stored_gui_nodes"
 let durob = initDuration(hours = 6)
 #let durob = initDuration(minutes = 30)
 
-let versionfl: float = 0.41
+let versionfl: float = 0.5
 
 
 
@@ -59,17 +59,27 @@ type
     persistInMem
     persistOnDisk
 
-const persisttype* = persistInMem    # see enum above and module-info
-#const persisttype* = persistOnDisk    # see enum above and module-info
+  Config* = ref object
+    persisttypeu*: PersistModeJson
+
 
 var liblock: Lock
 initLock(liblock)
 
 
+var cfgob* = Config(persisttypeu: persistNot)  # let = binding immutable, inhoud mutabel
+
+proc setPersistType*(persisttypeu: PersistModeJson) =
+  withLock liblock:
+    cfgob.persisttypeu = persisttypeu
+
+#const persisttype* = persistInMem    # see enum above and module-info
+#const persisttype* = persistOnDisk    # see enum above and module-info
+
+
 # create a table with jnobs, one for every tab
 #when persisttype == persistInMem:
 var jsondefta = initTable[string, JsonNode]()
-
 
 
 proc addOrUpdateDefTable(jsondefta: var Table[string, JsonNode]; nodeob: JsonNode; tabidst: string) = 
@@ -152,22 +162,20 @@ proc readStoredNode*(tabIDst, project_prefikst: string): JsonNode  =
 
   var filepathst: string
 
+  {.gcsafe.}:
+    if cfgob.persisttypeu == persistInMem:
+        addDefTable(jsondefta, readInitialNode(project_prefikst), tabIDst)  #   only if not present
+        result = jsondefta[tabIDst]
 
-  if persisttype == persistInMem:
-
-    {.gcsafe.}:
-      addDefTable(jsondefta, readInitialNode(project_prefikst), tabIDst)  #   only if not present
-      result = jsondefta[tabIDst]
-
-  elif persisttype == persistOnDisk:
-    filepathst = storednodesdir / tabIDst & ".json"
-    if existsOrCreateDir(storednodesdir):
-      if fileExists(filepathst):
-        result = parseFile(filepathst)
+    elif cfgob.persisttypeu == persistOnDisk:
+      filepathst = storednodesdir / tabIDst & ".json"
+      if existsOrCreateDir(storednodesdir):
+        if fileExists(filepathst):
+          result = parseFile(filepathst)
+        else:
+          result = readInitialNode(project_prefikst)
       else:
         result = readInitialNode(project_prefikst)
-    else:
-      result = readInitialNode(project_prefikst)
 
 
 
@@ -226,16 +234,16 @@ proc writeStoredNode*(tabIDst: string, storedjnob: JsonNode) =
   
   var filepathst: string
 
-  if persisttype == persistInMem:
-    # store in table of json-nodes
-    {.gcsafe.}:
-      addOrUpdateDefTable(jsondefta, storedjnob, tabIDst)   # existing or not
+  {.gcsafe.}:
+    if cfgob.persisttypeu == persistInMem:
+      # store in table of json-nodes
+        addOrUpdateDefTable(jsondefta, storedjnob, tabIDst)   # existing or not
 
-  elif persisttype == persistOnDisk:
-    #then serialize with pretty and write to file
-    filepathst = storednodesdir / tabIDst & ".json"
-    writeFile(filepathst, pretty(storedjnob))
-    updateAccessBook(tabIDst)
+    elif cfgob.persisttypeu == persistOnDisk:
+      #then serialize with pretty and write to file
+      filepathst = storednodesdir / tabIDst & ".json"
+      writeFile(filepathst, pretty(storedjnob))
+      updateAccessBook(tabIDst)
     
 
 

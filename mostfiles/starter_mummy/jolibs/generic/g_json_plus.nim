@@ -165,8 +165,10 @@ proc findDoubleKeys(keylistsq: seq[string]): seq[string] =
 
 proc pruneJnodesFromTree*(treejnob: var JsonNode, pathtoparentsq, 
                                     siblings_to_prunesq: seq[string]) = 
+
   # Remove items (siblings_to_prunesq) from the treejnob that are located at 
   # pathtoparentsq
+  
   for siblingst in siblings_to_prunesq:
     #echo siblingst
     if treejnob{pathtoparentsq}.hasKey(siblingst):

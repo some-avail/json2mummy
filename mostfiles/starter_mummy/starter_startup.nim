@@ -87,6 +87,10 @@ var
 initLock(mylock)
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+{.gcsafe.}:
+  #setPersistType(persistInMem)
+  setPersistType(persistOnDisk)
+
 
 proc showPage(par_innervarob, par_outervarob: var Context, 
               custominnerhtmlst:string=""): string = 
@@ -185,19 +189,19 @@ proc postProject(request: Request) {.gcsafe.} =
     gui_jnob: JsonNode
     tabidst: string = ""
 
-
-  when persisttype == persistNot:
-    gui_jnob = readInitialNode(project_prefikst)
-  else:
-    when persisttype == persistOnDisk: 
-      if theTimeIsRight():
-        deleteExpiredFromAccessBook()
-    if len(@"tab_ID") == 0:
-    #if len(request.queryparams("tab_ID")) == 0:
-      tabidst = genTabId()
+  {.gcsafe.}:
+    if cfgob.persisttypeu == persistNot:
+      gui_jnob = readInitialNode(project_prefikst)
     else:
-      tabidst = @"tab_ID"
-      #tabidst = request.queryparams("tab_ID")
+      if cfgob.persisttypeu == persistOnDisk: 
+        if theTimeIsRight():
+          deleteExpiredFromAccessBook()
+      if len(@"tab_ID") == 0:
+      #if len(request.queryparams("tab_ID")) == 0:
+        tabidst = genTabId()
+      else:
+        tabidst = @"tab_ID"
+        #tabidst = request.queryparams("tab_ID")
 
     gui_jnob = readStoredNode(tabidst, project_prefikst)
     innervarob["tab_id"] = tabidst
@@ -299,10 +303,10 @@ proc postProject(request: Request) {.gcsafe.} =
   # ****************** end of app-logic ***************************
 
 
-
-  when persisttype != persistNot:
-    # write the current page-layout to the jnob belonging to this tabID
-    writeStoredNode(tabidst, gui_jnob)
+  {.gcsafe.}:
+    if cfgob.persisttypeu != persistNot:
+      # write the current page-layout to the jnob belonging to this tabID
+        writeStoredNode(tabidst, gui_jnob)
 
 
 

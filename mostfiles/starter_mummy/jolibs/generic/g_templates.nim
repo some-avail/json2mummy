@@ -3,7 +3,7 @@ import std/[times, strutils]
 var versionfl: float = 0.13
 
 
-var wispbo* = true
+var wispbo* = false
 
 
 
@@ -37,7 +37,7 @@ template getTrace*(wordsq: varargs[string, `$`]) =
     let tob = getStackTraceEntries()      # a proc from the system-module
 
     if tob.len > 0:       # needed for release-compilation
-      echo "counting ", tob.len, " ", type(itemob)
+      #echo "counting ", tob.len, " ", type(itemob)
       for itemob in tob:
         #echo itemob
 
@@ -51,10 +51,19 @@ template getTrace*(wordsq: varargs[string, `$`]) =
 
 
 template wisp*(wordsq: varargs[string, `$`]) =
-  # works only for non-release-compilation; thats ok
+  #[echo-replacement that prepends the calling location.
+    Usefull for complicated hard to debug cases.
+    Works only for non-release-compilation; thats ok
+
+    call like:
+      wisp("some_nonstring_var = ", $some_nonstring_var)
+      wisp("some_string_var = ", some_string_var)
+      wisp("some_string_var = ", some_proc())
+  ]#
+
   var
     filepathst, filenamest, modulest, procnamest: string
-    hfilepathst, hfilenamest, hmodulest, hprocnamest: string    
+    hfilepathst, hfilenamest, hmodulest, hprocnamest: string    # h=higher
     pathsq, hpathsq: seq[string]
     messagest: string
 
