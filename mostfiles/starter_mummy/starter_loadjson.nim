@@ -38,10 +38,10 @@
 
 
 import std/[json, tables, os, times, strutils, locks]
-import jolibs/generic/[g_json_plus]
 
-# only use g_db2json when a database is used
-#import jolibs/generic/[g_db2json, g_json_plus]
+# only import g_json_plus and g_db2json when needed
+#import jolibs/generic/[g_json_plus]
+#import jolibs/generic/[g_db2json]
 
 
 const storednodesdir = "stored_gui_nodes"
@@ -49,7 +49,7 @@ const storednodesdir = "stored_gui_nodes"
 let durob = initDuration(hours = 6)
 #let durob = initDuration(minutes = 30)
 
-let versionfl: float = 0.5
+let versionfl: float = 0.51
 
 
 
@@ -95,6 +95,15 @@ proc addDefTable(jsondefta: var Table[string, JsonNode]; nodeob: JsonNode; tabid
     if not jsondefta.hasKey(tabidst):
       jsondefta[tabidst] = nodeob
 
+proc readDefTable*(jsondefta: var Table[string, JsonNode]; tabidst: string): JsonNode =
+# gc-safe operations; read
+  withLock liblock:
+    if jsondefta.hasKey(tabidst):
+      result = jsondefta[tabidst]
+    else:
+      result = newJNull()
+
+
 
 #[
 #  BELOW PROCS ARE NOT YET USED
@@ -111,14 +120,6 @@ proc deleteDefTable*(jsondefta: var Table[string, JsonNode]; tabidst: string) =
   withLock liblock:
     if jsondefta.hasKey(tabidst):
       jsondefta.del(tabidst)
-
-proc readDefTable*(jsondefta: var Table[string, JsonNode]; tabidst: string): JsonNode =
-# gc-safe operations; delete
-  withLock liblock:
-    if jsondefta.hasKey(tabidst):
-      result = jsondefta[tabidst]
-    else:
-      result = newJNull()
 ]#
 
 
@@ -228,6 +229,26 @@ proc updateAccessBook(tabIDst: string) =
   removeFile(bakfilepathst)
 
 
+proc copyStoredNode*(oldtabIDst, newtabIDst: string) = 
+  
+  var 
+    filepathst: string
+    oldstoredjnob: JsonNode
+
+
+  {.gcsafe.}:
+    if cfgob.persisttypeu == persistInMem:
+
+      oldstoredjnob = readDefTable(jsondefta, oldtabIDst)
+      # store in table of json-nodes
+      addDefTable(jsondefta, oldstoredjnob, newtabIDst) 
+
+    elif cfgob.persisttypeu == persistOnDisk:
+      #then serialize with pretty and write to file
+      filepathst = storednodesdir / newtabIDst & ".json"
+      writeFile(filepathst, pretty(oldstoredjnob))
+      updateAccessBook(oldtabIDst)
+
 
 
 proc writeStoredNode*(tabIDst: string, storedjnob: JsonNode) = 
@@ -237,7 +258,7 @@ proc writeStoredNode*(tabIDst: string, storedjnob: JsonNode) =
   {.gcsafe.}:
     if cfgob.persisttypeu == persistInMem:
       # store in table of json-nodes
-        addOrUpdateDefTable(jsondefta, storedjnob, tabIDst)   # existing or not
+      addOrUpdateDefTable(jsondefta, storedjnob, tabIDst)   # existing or not
 
     elif cfgob.persisttypeu == persistOnDisk:
       #then serialize with pretty and write to file

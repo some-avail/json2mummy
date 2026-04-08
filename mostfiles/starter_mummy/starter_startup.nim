@@ -60,7 +60,7 @@ import jolibs/generic/[g_json_plus, g_json2html, g_nim2json]
 
 
 const 
-  versionfl:float = 1.25
+  versionfl:float = 1.26
   project_prefikst = "starter"
   appnamebriefst = "ST"
   appnamenormalst = "Starter"
@@ -82,14 +82,15 @@ var
   globalvarst: string
 
   # guard-pragma (according to an AI) in-necesitates individual locks of the guarded variable.
+  # but is also dissuaded by AI as being inadequate. Using withLock is recommended.
   #globalvarst {.guard: mylock.}: string
 
 initLock(mylock)
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 {.gcsafe.}:
-  #setPersistType(persistInMem)
-  setPersistType(persistOnDisk)
+  setPersistType(persistInMem)
+  #setPersistType(persistOnDisk)
 
 
 proc showPage(par_innervarob, par_outervarob: var Context, 
@@ -233,6 +234,16 @@ proc postProject(request: Request) {.gcsafe.} =
   innervarob["text01"] = @"text01"
   innervarob["text02"] = @"text02"
   innervarob["text03"] = @"text03"
+
+  if @"curaction" == "set new ID..":
+    # regeneration of the ID and copying of the current config after cloning of tab
+    tabidst = genTabId()
+    {.gcsafe.}:
+      if cfgob.persisttypeu != persistNot:
+        # write the current page-layout to the jnob belonging to this tabID
+        copyStoredNode(@"tab_ID", tabidst)
+        innervarob["tab_id"] = tabidst
+
 
 
   if @"curaction" == "do action 1..":

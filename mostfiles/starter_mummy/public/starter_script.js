@@ -17,6 +17,16 @@ function reverseString(inputjs) {
   return outputjs
 }
 
+function butResetID() {
+
+  // call for regeneration of the ID and copying of the current config after cloning of tab
+  document.getElementsByName("curaction")[0].value = "set new ID..";
+  document.forms["webbieform"].submit();
+
+}
+
+
+
 
 function butProcedure1() {
   // reverse the string thru javascript

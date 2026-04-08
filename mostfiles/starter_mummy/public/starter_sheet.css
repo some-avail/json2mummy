@@ -108,7 +108,7 @@ select{
 
 .specialfield {
   background-color: antiquewhite;
-  width: 40%;
+  width: 35%;
   height: 20px;
   border-radius: 12px;
   font-size: 12px;
@@ -138,6 +138,22 @@ select{
   margin: 10px auto;
   cursor: pointer;
   width: 50%;
+  border-radius: 12px;
+  }
+
+
+.butSetID {
+  border: none;
+  color: white;
+  background-color: royalblue;
+  padding: 9px 9px 9px 9px;
+  text-align: left;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 12px;
+  margin: 1p 0px 5px 0px;
+  cursor: pointer;
+  width: 12px;
   border-radius: 12px;
   }
 
