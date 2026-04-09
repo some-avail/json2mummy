@@ -12,20 +12,17 @@ in either of two variables (i dont know if they are fully equivalent):
 * variables like @"controlname"
 * request.params["controlname"]
 
-Do not use global vars because the are not "gc-safe". GC stands for garbage-collection.
+Limit the use global vars because they are not "gc-safe". GC stands for garbage-collection.
 My (layman-) theory is that all threads have there own garbage-collection.
 When the main thread has nothing to do with other threads globals can gc-ed allright, 
 but when extra threads have been spawned, the gc of different threads gets mixed up 
 concerning the globals, and therefore in that case globals have been forbidden.
 (use locks for careful use of globals)
 
-Without globals you can compile for multi-threading
+Without globals or with locked globals you can compile for multi-threading
 with switch --threads:on which is mandatory in mummy (but not in jester)
 
 See also the module projectprefix_loadjson.nim
-Currently --threads :on compiles and runs succesfully under  
-persistence-mode = persistOnDisk in projectprefix_loadjson.nim. 
-See that module for further info.
 
 The cookie-tunnel code has been removed because one can easily run server-code thru
 the cur-action variable . This is a textarea element that can be set from javascript,
@@ -60,7 +57,7 @@ import jolibs/generic/[g_json_plus, g_json2html, g_nim2json]
 
 
 const 
-  versionfl:float = 1.26
+  versionfl:float = 1.28
   project_prefikst = "starter"
   appnamebriefst = "ST"
   appnamenormalst = "Starter"
@@ -88,9 +85,6 @@ var
 initLock(mylock)
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-{.gcsafe.}:
-  setPersistType(persistInMem)
-  #setPersistType(persistOnDisk)
 
 
 proc showPage(par_innervarob, par_outervarob: var Context, 
@@ -191,18 +185,12 @@ proc postProject(request: Request) {.gcsafe.} =
     tabidst: string = ""
 
   {.gcsafe.}:
-    if cfgob.persisttypeu == persistNot:
-      gui_jnob = readInitialNode(project_prefikst)
+    if len(@"tab_ID") == 0:
+    #if len(request.queryparams("tab_ID")) == 0:
+      tabidst = genTabId()
     else:
-      if cfgob.persisttypeu == persistOnDisk: 
-        if theTimeIsRight():
-          deleteExpiredFromAccessBook()
-      if len(@"tab_ID") == 0:
-      #if len(request.queryparams("tab_ID")) == 0:
-        tabidst = genTabId()
-      else:
-        tabidst = @"tab_ID"
-        #tabidst = request.queryparams("tab_ID")
+      tabidst = @"tab_ID"
+      #tabidst = request.queryparams("tab_ID")
 
     gui_jnob = readStoredNode(tabidst, project_prefikst)
     innervarob["tab_id"] = tabidst
@@ -239,10 +227,9 @@ proc postProject(request: Request) {.gcsafe.} =
     # regeneration of the ID and copying of the current config after cloning of tab
     tabidst = genTabId()
     {.gcsafe.}:
-      if cfgob.persisttypeu != persistNot:
-        # write the current page-layout to the jnob belonging to this tabID
-        copyStoredNode(@"tab_ID", tabidst)
-        innervarob["tab_id"] = tabidst
+      # write the current page-layout to the jnob belonging to this tabID
+      copyStoredNode(@"tab_ID", tabidst)
+      innervarob["tab_id"] = tabidst
 
 
 
@@ -263,6 +250,7 @@ proc postProject(request: Request) {.gcsafe.} =
         innervarob["statustext"] = globalvarst
 
 
+
   if @"curaction" == "do action 3..":
     # cycle thru words
     var testMultiThreadingbo: bool = true    
@@ -277,6 +265,7 @@ proc postProject(request: Request) {.gcsafe.} =
     else:   # set above var to true, open two tabs and see they are sleeping parallel (they do)
       sleep(8000)
       innervarob["statustext"] = "I am awake after 8 seconds..."
+
 
   
   if @"curaction" == "do action 4..":
@@ -315,9 +304,8 @@ proc postProject(request: Request) {.gcsafe.} =
 
 
   {.gcsafe.}:
-    if cfgob.persisttypeu != persistNot:
-      # write the current page-layout to the jnob belonging to this tabID
-        writeStoredNode(tabidst, gui_jnob)
+    # write the current page-layout to the jnob belonging to this tabID
+    writeStoredNode(tabidst, gui_jnob)
 
 
 

@@ -14,7 +14,7 @@
   User-data must be loaded from the routes-location
   in project_startup.nim to avoid shared data.
 
-  Stored node (in mem or on disk):
+  Stored node in memory:
   In this all tab-specific changes are stored, so 
   that the state of the tab's gui is saved. 
   When saved in memory this breaks no longer 
@@ -22,18 +22,19 @@
   since now official locking-mechanisms are used.
   (always use withlock for all global heap-structure-ops, 
   preferably use pre-made operations to minimize errors).
-  When saved on disk the global var is omitted and 
-  you can compile with multi-threading.
 
-  The below constant "persisttype" determines the 
-  behaviour.
+  When you want to use this code in production (website) you 
+  must add code to remove unused IDs from jsondefta. (see adap fut)
+
+  ADAP HIS:
+  - alternate persistance to disk has been deprecated / removed
 
   ADAP FUT:
-  -implement periodical clearance of jsondefta also when using memory aot disk.
+  -implement periodical clearance of jsondefta to avoid 
+  out-of-memory-situation
   -refactor this module by:
     -leaving the project-specific code in projprefix_loadjson
     -moving the generic code to g_loadjson.nim
-
  ]#
 
 
@@ -44,37 +45,11 @@ import std/[json, tables, os, times, strutils, locks]
 #import jolibs/generic/[g_db2json]
 
 
-const storednodesdir = "stored_gui_nodes"
-
-let durob = initDuration(hours = 6)
-#let durob = initDuration(minutes = 30)
-
-let versionfl: float = 0.51
-
-
-
-type
-  PersistModeJson* = enum
-    persistNot        # use only initial node without storage-needs
-    persistInMem
-    persistOnDisk
-
-  Config* = ref object
-    persisttypeu*: PersistModeJson
+let versionfl: float = 0.53
 
 
 var liblock: Lock
 initLock(liblock)
-
-
-var cfgob* = Config(persisttypeu: persistNot)  # let = binding immutable, inhoud mutabel
-
-proc setPersistType*(persisttypeu: PersistModeJson) =
-  withLock liblock:
-    cfgob.persisttypeu = persisttypeu
-
-#const persisttype* = persistInMem    # see enum above and module-info
-#const persisttype* = persistOnDisk    # see enum above and module-info
 
 
 # create a table with jnobs, one for every tab
@@ -125,7 +100,7 @@ proc deleteDefTable*(jsondefta: var Table[string, JsonNode]; tabidst: string) =
 
 proc initialLoading(parjnob: JsonNode): JsonNode = 
   #[
-  custom - load extra public data to the json-object
+  custom - load extra public data to the json-object (for example a user-list from a database)
   This is the only custom / project-specific function in this module.
   Currently not used; it passes the jnob thru.
   ]#
@@ -147,12 +122,16 @@ proc initialLoading(parjnob: JsonNode): JsonNode =
 
 
 proc readInitialNode*(proj_prefikst: string): JsonNode = 
+
+  # read a stored json-file and use it as the initial gui-config
+
   var 
     filest: string
     jnob, secondjnob: JsonNode
 
   filest = proj_prefikst & "_gui.json"
   jnob = parseFile(filest)
+  # optionally add data below
   secondjnob = initialLoading(jnob)
 
   result = secondjnob
@@ -161,182 +140,42 @@ proc readInitialNode*(proj_prefikst: string): JsonNode =
 
 proc readStoredNode*(tabIDst, project_prefikst: string): JsonNode  = 
 
-  var filepathst: string
+  # read the memory-stored json-config belonging to this webpage-id
 
   {.gcsafe.}:
-    if cfgob.persisttypeu == persistInMem:
-        addDefTable(jsondefta, readInitialNode(project_prefikst), tabIDst)  #   only if not present
-        result = jsondefta[tabIDst]
-
-    elif cfgob.persisttypeu == persistOnDisk:
-      filepathst = storednodesdir / tabIDst & ".json"
-      if existsOrCreateDir(storednodesdir):
-        if fileExists(filepathst):
-          result = parseFile(filepathst)
-        else:
-          result = readInitialNode(project_prefikst)
-      else:
-        result = readInitialNode(project_prefikst)
+    addDefTable(jsondefta, readInitialNode(project_prefikst), tabIDst)  #   only if not present
+    result = jsondefta[tabIDst]
 
 
-
-
-proc backupFile(filepathst:string): string =
-  # copy the given file to one with the suffix .bak
-  
-  var 
-    fulldirst: string
-    filest:string
-    bakfilest:string
-    bakfilepathst:string
-  
-  (fulldirst, filest) = splitPath(filepathst)
-  bakfilest = filest & ".bak"
-  bakfilepathst = joinPath(fulldirst, bakfilest)
-  copyFile(filepathst,bakfilepathst)
-  return bakfilepathst
-
-
-
-proc updateAccessBook(tabIDst: string) =   
-  #[ 
-  Find tabidst in file and update the corresponding
-  time-stamp.
-   ]#
-
-  var filepathst, bakfilepathst: string
-
-  filepathst = storednodesdir / "node_access_book.txt"
-  
-  if not fileExists(filepathst):
-    writeFile(filepathst, "")
-
-  bakfilepathst = backupFile(filepathst)
-
-  var
-    bob = open(bakfilepathst, fmRead)
-    fob = open(filepathst, fmWrite)
-
-  for line in bob.lines:
-    if not (tabIDst in line):
-      fob.writeLine(line)
-
-  fob.writeLine(tabIDst & "__" & format(now(), "yyyy-MM-dd'T'HH-mm-ss"))
-
-  bob.close()
-  fob.close()
-
-  removeFile(bakfilepathst)
 
 
 proc copyStoredNode*(oldtabIDst, newtabIDst: string) = 
-  
+
+  # copy a stored node and link it a new ID (usefull after cloning a tab)
+
   var 
-    filepathst: string
     oldstoredjnob: JsonNode
 
-
   {.gcsafe.}:
-    if cfgob.persisttypeu == persistInMem:
-
-      oldstoredjnob = readDefTable(jsondefta, oldtabIDst)
-      # store in table of json-nodes
-      addDefTable(jsondefta, oldstoredjnob, newtabIDst) 
-
-    elif cfgob.persisttypeu == persistOnDisk:
-      #then serialize with pretty and write to file
-      filepathst = storednodesdir / newtabIDst & ".json"
-      writeFile(filepathst, pretty(oldstoredjnob))
-      updateAccessBook(oldtabIDst)
+    oldstoredjnob = readDefTable(jsondefta, oldtabIDst)
+    # store in table of json-nodes
+    addDefTable(jsondefta, oldstoredjnob, newtabIDst) 
 
 
 
 proc writeStoredNode*(tabIDst: string, storedjnob: JsonNode) = 
-  
-  var filepathst: string
+
+  # when a page has changed config you must write a to the ID-linked json-node
 
   {.gcsafe.}:
-    if cfgob.persisttypeu == persistInMem:
-      # store in table of json-nodes
-      addOrUpdateDefTable(jsondefta, storedjnob, tabIDst)   # existing or not
+    # store in table of json-nodes
+    addOrUpdateDefTable(jsondefta, storedjnob, tabIDst)   # existing or not
 
-    elif cfgob.persisttypeu == persistOnDisk:
-      #then serialize with pretty and write to file
-      filepathst = storednodesdir / tabIDst & ".json"
-      writeFile(filepathst, pretty(storedjnob))
-      updateAccessBook(tabIDst)
     
-
-
-
-proc deleteExpiredFromAccessBook*() =
-  #[
-  pseudocode:
-  for every line in access-book:
-    get the time-stamp
-    see it time-stamp has been expired
-      (meaning time-now > time-stamp plus predefined duration)
-      if yes:
-        remove json-file
-        remove the line from the access-book
-  ]#
-
-  var 
-    filepathst, bakfilepathst, tabIDst: string
-    linesq: seq[string] = @[]
-    timeob: DateTime
-
-
-  filepathst = storednodesdir / "node_access_book.txt"
-  
-  if fileExists(filepathst):
-
-    bakfilepathst = backupFile(filepathst)
-
-    var
-      bob = open(bakfilepathst, fmRead)
-      fob = open(filepathst, fmWrite)
-
-    for line in bob.lines:
-      linesq = line.split("__")
-      timeob = parse(linesq[1], "yyyy-MM-dd'T'HH-mm-ss")
-      tabIDst = linesq[0]
-
-      if now() > timeob + durob:
-        # file-expiration-time reached
-        removeFile(storednodesdir / tabIDst & ".json" )
-      else:
-        # keep file-line in access-book
-        fob.writeLine(line)
-
-
-    bob.close()
-    fob.close()
-
-    removeFile(bakfilepathst)
-
-
-
-proc theTimeIsRight*(): bool = 
-  
-  #[ 
-    look if a certain time-element is reached 
-    in order to perform an operation only a certain
-    percentage of the time.
-    e.g. [4,14,24,34,44,54] returns true 10 % of the time.
-   ]#
-
-  if minute(now()) in [4,14,24,34,44,54]:
-    result = true
-  else:
-    result = false
-
-
-
 
 
 
 when isMainModule:
   #deleteExpiredFromAccessBook()
-  echo ifTheTimeIsRight()
+  echo "hi"
 
